@@ -1,11 +1,34 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+const databaseName = 'CarHome'; // 数据库名字
+mongoose.connect(`mongodb://localhost/${databaseName}`);
 
 const ObjectId = mongoose.Schema.Types.ObjectId; // 特殊类型
-const likeSchema = new mongoose.Schema({
+const likeSchema = new mongoose.Schema({ // 点赞信息，只允许汽车或帖子被点赞
     pid: ObjectId,
     cid: String,
     uid: ObjectId,
+    time: {
+        type: Date,
+        default: Date.now,
+    },
+    isLook: Boolean, // 是否已经查看过了
+});
+
+const commentSchema = new mongoose.Schema({
+    pid: ObjectId,
+    cid: String,
+    uid: ObjectId,
+    describe: String,
+    comment_time: {
+        type: Date,
+        default: Date.now,
+    },
+    isLook: Boolean, // 是否已经查看过了
+});
+
+const collectionSchema = new mongoose.Schema({
+    pid: ObjectId,
+    cid: String,
 });
 
 const userSchema = new mongoose.Schema({
@@ -23,6 +46,7 @@ const userSchema = new mongoose.Schema({
     },
     sex: {
         type: String,
+        default: '男',
         enum: ['男', '女']
     },
     avater: String, // 头像
@@ -32,12 +56,18 @@ const userSchema = new mongoose.Schema({
         province: String,
         city: String,
     },
-    like_message: [
+    like_message: [ // 点赞信息
         likeSchema
     ],
+    comment_message: [ // 评论信息
+        commentSchema,
+    ],
+    collection_info: [ // 收藏信息
+        collectionSchema,
+    ]
 
 });
 
-const User = mongoose.model('User', {
+const User = mongoose.model('User', userSchema);
 
-})
+module.exports = User;

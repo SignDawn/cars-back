@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session'); // session 配置
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,6 +20,13 @@ app.use(express.json());
 app.use(express.urlencoded({
   extended: false
 }));
+// session
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'cars_back',
+  name: 'sessionId'
+}))
+// --------
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
