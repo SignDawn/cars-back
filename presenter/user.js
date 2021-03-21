@@ -47,11 +47,26 @@ export async function loginChecked(username, password) {
  * @param {Object} params 参数
  */
 export async function changeBaseInfo(id, params) {
-    let sex, avater, describe, location;
-    if (params.sex) {
-        sex = params.sex;
-    }
+    await User.findByIdAndUpdate(id, params);
+}
+
+/**
+ * 通过 id 查询个人信息
+ * @param {String} id 
+ * @returns {Promise<any>}
+ */
+export async function getUserInfoById(id) {
+    const user = await User.findById(id);
+    return user;
+}
+
+/**
+ * 通过 id 修改密码
+ * @param {String} id 用户 id
+ * @param {String} password 密码
+ */
+export async function changePassword(id, password) {
     await User.findByIdAndUpdate(id, {
-        av
+        password
     });
 }

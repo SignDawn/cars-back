@@ -4,7 +4,9 @@ import {
     isAgainUserName,
     registerUser,
     loginChecked,
-    changeBaseInfo
+    changeBaseInfo,
+    getUserInfoById,
+    changePassword
 } from '../presenter/user';
 
 // 注册
@@ -63,9 +65,26 @@ router.post('/login', async function (req, res, next) {
     })
 });
 
+// 获取登陆信息
+router.get('/info', async function (req, res, next) {
+    // 1. 通过前端 cookie seesion，判断 是谁
+    const user = req.session.user;
+    if (!user) {
+        return res.json({
+            code: 'error',
+            message: '请先登陆',
+        });
+    }
+    // 到这里说明登陆过，返回个人信息
+    res.json({
+        code: 'ok',
+        message: '登陆成功',
+        data: user, // 配置给前端，让其方便操作
+    })
+});
 
 // 修改登陆信息
-router.post('/info', async function (req, res, next) {
+router.put('/info', async function (req, res, next) {
     // 1. 获取参数
     console.log(req.body);
     const params = req.body;
@@ -77,11 +96,49 @@ router.post('/info', async function (req, res, next) {
             message: '请先登陆',
         });
     }
-    // 3. 更改对应 user 的基本信息
-    const info = await changeBaseInfo(user._id, params);
-    console.log(info);
-    res.send('love')
+    // 3. 筛选 params 属性，只保留 sex，avater，describe，location
+    let afterParams = {};
+    const propertyArr = ['sex', 'avater', 'describe', 'location'];
+    for (const key in params) {
+        if (Object.hasOwnProperty.call(params, key)) { // 自身属性
+            if (propertyArr.includes(key)) {
+                afterParams[key] = params[key];
+            }
+        }
+    }
+    // 4. 更改对应 user 的基本信息
+    await changeBaseInfo(user._id, afterParams);
+    // 5. 用户信息更改过，这里修改 session
+    const newUser = await getUserInfoById(user._id);
+    req.session.user = newUser;
+    res.json({
+        code: 'ok',
+        message: '修改成功',
+    })
 });
+
+// 修改密码，确认密码等操作由前端控制
+router.put('/password', async function (req, res, next) {
+    // 1. 获取参数
+    console.log(req.body);
+    const password = req.body.password;
+    // 2. 通过前端 cookie seesion，判断 是谁
+    const user = req.session.user;
+    if (!user) {
+        return res.json({
+            code: 'error',
+            message: '请先登陆',
+        });
+    }
+    // 3. 修改密码
+    await changePassword(user._id, password);
+    res.json({
+        code: 'ok',
+        message: '密码修改成功',
+    });
+    // TODO: 修改密码后是否需要重新登录，待考虑
+});
+
 
 
 module.exports = router;

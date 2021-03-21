@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-const databaseName = 'CarHome'; // 数据库名字
-mongoose.connect(`mongodb://localhost/${databaseName}`);
+import mongoose from './index';
 
 const ObjectId = mongoose.Schema.Types.ObjectId; // 特殊类型
 const likeSchema = new mongoose.Schema({ // 点赞信息，只允许汽车或帖子被点赞
