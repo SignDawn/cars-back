@@ -7,6 +7,7 @@ var session = require('express-session'); // session 配置
 
 const userRouter = require('./routes/user'); // 用户 router
 const carRouter = require('./routes/car'); // 汽车 router
+const postRouter = require('./routes/post'); // 帖子 router
 
 var app = express();
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const baseUrl = '/api';
 app.use(baseUrl + '/user', userRouter);
 app.use(baseUrl + '/car', carRouter);
+app.use(baseUrl + '/post', postRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
