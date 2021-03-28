@@ -1,5 +1,8 @@
 import Car from '../model/car';
 import User from '../model/user';
+import {
+    getUserInfoById
+} from './user'
 
 /**
  * 
@@ -41,7 +44,17 @@ export async function getCarByDetailId(detailId) {
     const car = await Car.findOne({
         "specificCars.detailId": detailId
     });
-    return car.specificCars.find(item => item.detailId === detailId);
+    const specificCar = car.specificCars.find(item => item.detailId === detailId);
+    // 根据点赞列表去查询一下 username
+    specificCar.like_list = post.like_list.map(async uid => {
+        // TODO: 如此的查询效率可能较低，考虑更改
+        const user = await getUserInfoById(uid);
+        return {
+            uid,
+            username: user.username
+        };
+    });
+    return specificCar;
 }
 
 /**

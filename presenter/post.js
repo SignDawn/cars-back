@@ -23,12 +23,12 @@ export async function getPosts(theme, page, pageSize) {
     const table = await Car.find(params)
         .skip((page - 1) * pageSize).limit(pageSize);
     // 1. 每个帖子发帖人的基本信息
-    table.forEach(item => {
+    table.forEach(async item => {
         const poster = await getUserInfoById(item.uid);
         item.poster = poster;
         item.content = null; // 查询多条，减少返回具体内容
         // 根据点赞的人们的 id ，想要获取他们的名字
-        item.like_list = item.like_list.map(uid => {
+        item.like_list = item.like_list.map(async uid => {
             // TODO: 如此的查询效率可能较低，考虑更改
             const user = await getUserInfoById(uid);
             return {
@@ -49,7 +49,7 @@ export async function getPosts(theme, page, pageSize) {
 export async function getPostById(pid) {
     const post = await Post.findById(pid);
     post.poster = await getUserInfoById(post.uid);
-    post.like_list = post.like_list.map(uid => {
+    post.like_list = post.like_list.map(async uid => {
         // TODO: 如此的查询效率可能较低，考虑更改
         const user = await getUserInfoById(uid);
         return {

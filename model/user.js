@@ -1,9 +1,8 @@
 import mongoose from './index';
 
 const ObjectId = mongoose.Schema.Types.ObjectId; // 特殊类型
-const likeSchema = new mongoose.Schema({ // 点赞信息，只允许汽车或帖子被点赞
+const likeSchema = new mongoose.Schema({ // 点赞信息，只允许汽车、评论被点赞，但点赞汽车不会通知到个人
     pid: ObjectId,
-    cid: String,
     uid: ObjectId,
     time: {
         type: Date,
@@ -13,6 +12,10 @@ const likeSchema = new mongoose.Schema({ // 点赞信息，只允许汽车或帖
 });
 
 const commentSchema = new mongoose.Schema({
+    // 评论信息
+    // 1. 评论汽车不会有人收到通知
+    // 2. 评论帖子，有人会收到通知
+    // 3. 评论评论，即回复某人时，且该评论在汽车下，这样就会用到 cid
     pid: ObjectId,
     cid: String,
     uid: ObjectId,

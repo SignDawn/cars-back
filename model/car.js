@@ -1,5 +1,6 @@
 import mongoose from './index';
 
+const ObjectId = mongoose.Schema.Types.ObjectId; // 特殊类型
 const keyAndValueSchema = new mongoose.Schema({
     key: String,
     value: String,
@@ -12,7 +13,8 @@ const specificCarSchema = new mongoose.Schema({
     images: [String], // 图
     detailConfig: [
         keyAndValueSchema
-    ]
+    ],
+    like_list: [ObjectId], // 点赞列表
 })
 
 const carSchema = new mongoose.Schema({
