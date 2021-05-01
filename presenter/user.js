@@ -57,6 +57,7 @@ export async function changeBaseInfo(id, params) {
  */
 export async function getUserInfoById(id) {
     const user = await User.findById(id);
+    user.password = undefined;
     return user;
 }
 
@@ -69,4 +70,14 @@ export async function changePassword(id, password) {
     await User.findByIdAndUpdate(id, {
         password
     });
+}
+/**
+ * 判断当前 id 的密码是不是该值
+ * @param {String} id 用户 id
+ * @param {String} password 原密码
+ * @returns {Boolean}
+ */
+export async function checkedPassword(id, password) {
+    const user = await User.findById(id);
+    return user.password === password;
 }

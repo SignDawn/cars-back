@@ -6,7 +6,8 @@ import {
     loginChecked,
     changeBaseInfo,
     getUserInfoById,
-    changePassword
+    changePassword,
+    checkedPassword
 } from '../presenter/user';
 
 // 注册
@@ -122,6 +123,7 @@ router.put('/password', async function (req, res, next) {
     // 1. 获取参数
     console.log(req.body);
     const password = req.body.password;
+    const new_password = req.body.new_password;
     // 2. 通过前端 cookie seesion，判断 是谁
     const user = req.session.user;
     if (!user) {
@@ -130,13 +132,20 @@ router.put('/password', async function (req, res, next) {
             message: '请先登陆',
         });
     }
+    // 判断密码是否正确
+    if (!(await checkedPassword(user._id, password))) {
+        // 密码不正确
+        return res.json({
+            code: 'error',
+            message: '原密码错误'
+        })
+    }
     // 3. 修改密码
-    await changePassword(user._id, password);
+    await changePassword(user._id, new_password);
     res.json({
         code: 'ok',
         message: '密码修改成功',
     });
-    // TODO: 修改密码后是否需要重新登录，待考虑
 });
 
 
