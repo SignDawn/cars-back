@@ -46,7 +46,7 @@ export async function getCarByDetailId(detailId) {
     });
     const specificCar = car.specificCars.find(item => item.detailId === detailId);
     // 根据点赞列表去查询一下 username
-    specificCar.like_list = post.like_list.map(async uid => {
+    specificCar.like_list = specificCar.like_list.map(async uid => {
         // TODO: 如此的查询效率可能较低，考虑更改
         const user = await getUserInfoById(uid);
         return {

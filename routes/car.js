@@ -56,6 +56,16 @@ router.post('/collection', async function (req, res, next) {
             message: '请先登陆',
         });
     }
+    // 判断当前登录人是否已经收藏该汽车
+    if (user.collection_info instanceof Array) {
+        const cids = user.collection_info.map(item => item.cid);
+        if (cids.includes(detailId)) {
+            return res.json({
+                code: 'error',
+                message: '已收藏该汽车',
+            });
+        }
+    }
     // 3. 收藏对应 id 汽车
     await collectCar(user._id, detailId);
     // 4. 重新配置 session

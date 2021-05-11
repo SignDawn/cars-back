@@ -7,7 +7,9 @@ import {
     likeCar,
     likePost,
     noticePosterLike,
-    getComment
+    getComment,
+    checkedCarsTheUser,
+    checkedPostsTheUser
 } from '../presenter/comment';
 
 // 评论
@@ -87,11 +89,25 @@ router.post('/like', async function (req, res, next) {
     // 判断类型
     // 1. 是对车子进行点赞
     if (body.cid) { // 这里不需要时间
+        // 判断该车是否已经被该用户点赞
+        if (await checkedCarsTheUser(body.cid, user._id)) {
+            return res.json({
+                code: 'error',
+                message: '你已经点赞过',
+            });
+        }
         await likeCar(body.cid, user._id);
         // 不需要通知
     }
     // 2. 对帖子进行点赞
     if (body.pid) {
+        // 判断该车是否已经被该用户点赞
+        if (await checkedPostsTheUser(body.pid, user._id)) {
+            return res.json({
+                code: 'error',
+                message: '你已经点赞过',
+            });
+        }
         await likePost(body.pid, user._id);
         // 点赞后需要通知发帖人，有人点赞了
         await noticePosterLike(body.pid, user._id);

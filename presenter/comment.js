@@ -78,6 +78,33 @@ export async function noticeOther(pid, cid, uid, describe, answer_uid, comment_t
 }
 
 /**
+ * 
+ * @param {*} cid 
+ * @param {*} uid 
+ * @returns true 说明重复
+ */
+export async function checkedCarsTheUser(cid, uid) {
+    const car = await Car.findOne({
+        "specificCars.detailId": cid
+    });
+    const specificCar = car.specificCars.find(item => item.detailId === cid);
+    if (specificCar.like_list.includes(uid)) {
+        // 包含，说明重复
+        return true;
+    }
+    return false;
+}
+
+export async function checkedPostsTheUser(pid, uid) {
+    const post = await Post.findById(pid);
+    if (post.like_list.includes(uid)) {
+        // 包含，说明重复
+        return true;
+    }
+    return false;
+}
+
+/**
  * 对该汽车进行点赞
  * @param {String} cid 汽车 id
  * @param {String} uid 用户 id
@@ -91,7 +118,7 @@ export async function likeCar(cid, uid) {
     await Car.findOneAndUpdate({
         "specificCars.detailId": cid
     }, {
-        specificCar
+        specificCars: car.specificCars
     });
 }
 /**
@@ -150,7 +177,9 @@ export async function getComment(cid, pid, page, pageSize) {
     // 计算结果
     const table = await Comment.find(params)
         .skip((page - 1) * pageSize).limit(pageSize);
-    table.forEach(async comment => {
+    // 转换成传统对象
+    const newTable = JSON.parse(JSON.stringify(table));
+    for (const comment of newTable) {
         const commentUser = await getUserInfoById(comment.uid)
         comment.commentUser = commentUser; // 评论人基本信息
         if (comment.answer_uid) {
@@ -158,9 +187,9 @@ export async function getComment(cid, pid, page, pageSize) {
             const answerUser = await getUserInfoById(comment.answer_uid);
             comment.answerUser = answerUser;
         }
-    });
+    }
     return {
         total,
-        table,
+        table: newTable,
     };
 }
