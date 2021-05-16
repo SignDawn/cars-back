@@ -20,10 +20,11 @@ export async function getPosts(theme, page, pageSize) {
     }
     const total = await Post.find(params).count(); // 先计算数量
     // 计算结果
-    const table = await Car.find(params)
+    const table = await Post.find(params)
         .skip((page - 1) * pageSize).limit(pageSize);
+    const newTable = JSON.parse(JSON.stringify(table));
     // 1. 每个帖子发帖人的基本信息
-    table.forEach(async item => {
+    for (const item of newTable) {
         const poster = await getUserInfoById(item.uid);
         item.poster = poster;
         item.content = null; // 查询多条，减少返回具体内容
@@ -36,10 +37,10 @@ export async function getPosts(theme, page, pageSize) {
                 username: user.username
             };
         });
-    });
+    }
     return {
         total,
-        table
+        table: newTable
     };
 }
 /**
